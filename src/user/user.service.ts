@@ -17,4 +17,4 @@ export class UserService {
     }
     return { status: 200, body: { message: 'Success!' } };
   }
-} 
+}
