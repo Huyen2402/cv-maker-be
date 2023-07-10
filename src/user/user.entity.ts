@@ -20,6 +20,6 @@ export class UserEntity {
   @Column()
   dob: Date;
 
-  @Column({name: 'is_deleted'})
+  @Column({ name: 'is_deleted' })
   isDeleted: Date;
 }

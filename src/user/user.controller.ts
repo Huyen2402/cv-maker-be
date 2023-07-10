@@ -1,13 +1,8 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Res,
-} from '@nestjs/common';
+import { Controller, Post, Body, Res } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { UserService } from './user.service';
-import { UserLoginDTO } from './dto/user.dto';
-import { UserLoginRO } from './ro/user.ro';
+import { UserLoginDTO } from '../user/dto/user.dto';
+import { UserLoginRO } from '../user/ro/user.ro';
 
 @Controller('user')
 export class UserController {
