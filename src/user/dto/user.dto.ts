@@ -1,4 +1,10 @@
-import { IsBoolean, IsNumber, IsString } from '@nestjs/class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from '@nestjs/class-validator';
 import { ApiProperty, PickType } from '@nestjs/swagger';
 
 export class UserDTO {
@@ -7,23 +13,28 @@ export class UserDTO {
   id: number;
 
   @ApiProperty()
-  @IsString()
+  @IsEmail()
+  @IsNotEmpty()
   email: string;
 
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   password: string;
 
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   fullName: string;
 
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   phone: string;
 
   @ApiProperty()
   @IsBoolean()
+  @IsNotEmpty()
   isDeleted: string;
 }
 

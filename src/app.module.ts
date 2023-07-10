@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthenMiddleware } from 'common/middleware/authen.middleware';
-import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
