@@ -1,5 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { UserLoginEntity } from '../user_login/user_login.entity';
 @Entity('user')
 export class UserEntity {
   @PrimaryGeneratedColumn()
@@ -22,4 +22,9 @@ export class UserEntity {
 
   @Column({ name: 'is_deleted' })
   isDeleted: Date;
+
+  // @OneToMany('User_login', (user_login: UserLoginEntity) => user_login.user)
+  // user_login: UserLoginEntity[];
+  @OneToMany((type) => UserLoginEntity, (user) => user.user)
+  user_login: UserLoginEntity[];
 }
