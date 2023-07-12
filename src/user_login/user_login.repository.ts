@@ -15,4 +15,7 @@ export class UserLoginRepository extends Repository<UserLoginEntity> {
     user.user = user_login.user;
     return await this.save(user);
   }
+  async checkToken(access_token: string) {
+    return await this.findOne({ where: { access_token } });
+  }
 }
