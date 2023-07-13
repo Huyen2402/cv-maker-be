@@ -42,3 +42,10 @@ export class UserLoginDTO extends PickType(UserDTO, [
   'email',
   'password',
 ] as const) {}
+
+export class UserRefreshTokenDTO {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  refreshToken: string;
+}
