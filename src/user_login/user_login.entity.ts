@@ -15,6 +15,9 @@ export class UserLoginEntity {
   @Column({ name: 'is_used' })
   isUsed: boolean;
 
+  @Column()
+  userId: number;
+
   @ManyToOne(() => UserEntity)
   user: UserEntity;
 }

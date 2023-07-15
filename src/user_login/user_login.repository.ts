@@ -1,4 +1,4 @@
-import { EntityManager, Repository, getConnection } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { UserLoginEntity } from './user_login.entity';
 
@@ -7,21 +7,26 @@ export class UserLoginRepository extends Repository<UserLoginEntity> {
   constructor(private readonly emanager: EntityManager) {
     super(UserLoginEntity, emanager);
   }
+
   async createUserLogin(user_login: any) {
     const user = new UserLoginEntity();
     user.access_token = user_login.access_token;
     user.refresh_token = user_login.refresh_token;
-    user.user = user_login.user;
+    user.userId = user_login.userId;
     user.isUsed = false;
     return await this.save(user);
   }
 
-  async checkRefreshToken(refresh_token: string) {
-    return await this.findOne({ where: { refresh_token } });
+  async checkAccessToken(access_token: string) {
+    return await this.findOne({ where: { access_token } });
   }
 
-  async deleteById(id: number) {
-    return await this.delete(id);
+  async deleteByUser(userId: number) {
+    return await this.createQueryBuilder('user_login')
+      .delete()
+      .from(UserLoginEntity)
+      .where('user_login.userId = :userId', { userId })
+      .execute();
   }
 
   async updateIsUsedById(id: number) {
@@ -30,5 +35,9 @@ export class UserLoginRepository extends Repository<UserLoginEntity> {
       .set({ isUsed: true })
       .where('id = :id', { id })
       .execute();
+  }
+
+  async findByUserId(userId: number) {
+    return await this.findOne({ where: { userId } });
   }
 }

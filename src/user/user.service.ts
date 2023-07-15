@@ -33,13 +33,13 @@ export class UserService {
 
     const accessToken = await this.generateToken(
       userFakeData,
-      process.env.ACCESS_TOKEN_SECRET,
+      '12345aA!#',
       process.env.ACCESS_TOKEN_LIFE,
     );
 
     const refreshToken = await this.generateToken(
       userFakeData,
-      process.env.REFRESH_TOKEN_SECRET,
+      '12345aA!#',
       process.env.REFRESH_TOKEN_LIFE,
     );
 
@@ -47,8 +47,8 @@ export class UserService {
       refresh_token: refreshToken,
       access_token: accessToken,
       user: emailFound,
+      userId: emailFound.id,
     };
-
     await this.userLoginRepository.createUserLogin(bodyUser);
 
     return {
@@ -77,49 +77,47 @@ export class UserService {
     return token;
   }
 
-  async refreshToken(refresh_token: string) {
-    const refreshTokenFromClient = refresh_token;
-    const userLoginFound = await this.userLoginRepository.checkRefreshToken(
-      refresh_token,
+  async refreshToken(access_token: string) {
+    const userLoginFound = await this.userLoginRepository.checkAccessToken(
+      access_token,
     );
     if (!userLoginFound) {
-      return { status: 403, body: { message: 'Invalid refresh token.' } };
+      return { status: 403, body: { message: 'Invalid access token.' } };
     }
 
     if (userLoginFound.isUsed) {
-      await this.userLoginRepository.deleteById(userLoginFound.id);
-      return { status: 403, body: { message: 'Invalid refresh token.' } };
+      await this.userLoginRepository.deleteByUser(userLoginFound.userId);
+      return { status: 403, body: { message: 'Invalid access token.' } };
     }
     await this.userLoginRepository.updateIsUsedById(userLoginFound.id);
 
-    if (!_.isNil(refreshTokenFromClient) && !_.isNil(userLoginFound)) {
+    if (!_.isNil(userLoginFound)) {
       try {
         const decoded = await this.verifyToken(
-          refreshTokenFromClient,
-          process.env.REFRESH_TOKEN_SECRET,
+          userLoginFound.refresh_token,
+          '12345aA!#',
         );
 
         const userFakeData = decoded.data;
         const accessToken = await this.generateToken(
           userFakeData,
-          process.env.ACCESS_TOKEN_SECRET,
+          '12345aA!#',
           process.env.ACCESS_TOKEN_LIFE,
         );
 
         const refreshToken = await this.generateToken(
           userFakeData,
-          process.env.REFRESH_TOKEN_SECRET,
+          '12345aA!#',
           process.env.REFRESH_TOKEN_LIFE,
         );
 
         const bodyUser = {
           refresh_token: refreshToken,
           access_token: accessToken,
+          userId: userLoginFound.userId,
         };
 
-        if (userLoginFound.isUsed) {
-          await this.userLoginRepository.createUserLogin(bodyUser);
-        }
+        await this.userLoginRepository.createUserLogin(bodyUser);
 
         return {
           status: 200,
@@ -141,5 +139,9 @@ export class UserService {
     return await this.jwt.verifyAsync(token, {
       secret: secretKey,
     });
+  }
+
+  async decodeToken(token) {
+    return await this.jwt.decode(token);
   }
 }
