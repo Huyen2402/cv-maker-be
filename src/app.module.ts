@@ -1,6 +1,7 @@
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
+import { TemplateModule } from './templates/template.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthenMiddleware } from 'common/middleware/authen.middleware';
 
@@ -17,6 +18,7 @@ import { AuthenMiddleware } from 'common/middleware/authen.middleware';
       synchronize: true,
     }),
     UserModule,
+    TemplateModule,
     ConfigModule.forRoot(),
   ],
 })
