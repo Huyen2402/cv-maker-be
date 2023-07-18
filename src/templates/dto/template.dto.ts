@@ -13,4 +13,8 @@ export class TemplateDTO {
   @ApiProperty()
   @IsString()
   image: string;
+
+  @ApiProperty()
+  @IsBoolean()
+  is_deleted: boolean;
 }
