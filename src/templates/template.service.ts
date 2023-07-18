@@ -14,4 +14,22 @@ export class TemplateService {
       },
     };
   }
+
+  async Create(body) {
+    const checkName = await this.templateRepository.checkName();
+    console.log(checkName);
+    const newTemp = {
+      name: body.name,
+      title: body.title,
+      image: body.image,
+    };
+    const add = await this.templateRepository.addTemplate(newTemp);
+    console.log(add);
+    return {
+      status: 200,
+      body: {
+        checkName,
+      },
+    };
+  }
 }

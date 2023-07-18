@@ -11,4 +11,21 @@ export class TemplateRepository extends Repository<TemplateEntity> {
   async getAllTemplate() {
     return await this.find();
   }
+
+  async addTemplate(body) {
+    const template = new TemplateEntity();
+    template.image = body.image;
+    template.is_deleted = false;
+    template.name = body.name;
+    template.title = body.title;
+    return await this.save(template);
+  }
+  async checkName() {
+    return await this.find({
+      take: 1,
+      order: {
+        name: 'DESC',
+      },
+    });
+  }
 }

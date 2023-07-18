@@ -22,3 +22,9 @@ export class TemplateDTO {
   @IsString()
   title: string;
 }
+
+export class TemplateBody extends PickType(TemplateDTO, [
+  'name',
+  'title',
+  'image',
+] as const) {}
