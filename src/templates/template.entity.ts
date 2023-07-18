@@ -13,4 +13,7 @@ export class TemplateEntity {
 
   @Column()
   is_deleted: boolean;
+
+  @Column({ length: 255 })
+  title: string;
 }
