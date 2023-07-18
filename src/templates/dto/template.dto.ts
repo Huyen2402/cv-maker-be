@@ -17,4 +17,8 @@ export class TemplateDTO {
   @ApiProperty()
   @IsBoolean()
   is_deleted: boolean;
+
+  @ApiProperty()
+  @IsString()
+  title: string;
 }
