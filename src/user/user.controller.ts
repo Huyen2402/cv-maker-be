@@ -11,6 +11,8 @@ export class UserController {
   @ApiOkResponse({ type: UserLoginRO })
   @Post('/login')
   async create(@Body() user: UserLoginDTO, @Res() res) {
+    console.log(user);
+    
     const result = await this.userService.login(user.email, user.password);
     return res.status(result.status).json(result.body);
   }
