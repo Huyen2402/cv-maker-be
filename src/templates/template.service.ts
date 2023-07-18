@@ -10,7 +10,7 @@ export class TemplateService {
     return {
       status: 200,
       body: {
-        result: result,
+        result,
       },
     };
   }
