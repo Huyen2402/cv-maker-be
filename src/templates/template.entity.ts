@@ -10,4 +10,7 @@ export class TemplateEntity {
 
   @Column({ length: 255 })
   image: string;
+
+  @Column()
+  is_deleted: boolean;
 }
