@@ -18,7 +18,11 @@ export class TemplateRepository extends Repository<TemplateEntity> {
     template.is_deleted = false;
     template.name = body.name;
     template.title = body.title;
-    return await this.save(template);
+    return await this.emanager.transaction(
+      async (transactionalEntityManager) => {
+        await transactionalEntityManager.save(template);
+      },
+    );
   }
   async checkName() {
     return await this.find({

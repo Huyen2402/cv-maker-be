@@ -15,20 +15,18 @@ export class TemplateService {
     };
   }
 
-  async Create(body) {
-    const checkName = await this.templateRepository.checkName();
-    console.log(checkName);
+  async Create(body, file) {
     const newTemp = {
-      name: body.name,
+      name: file.originalname,
       title: body.title,
       image: body.image,
     };
     const add = await this.templateRepository.addTemplate(newTemp);
-    console.log(add);
     return {
       status: 200,
       body: {
-        checkName,
+        result: true,
+        statusCode: 201,
       },
     };
   }

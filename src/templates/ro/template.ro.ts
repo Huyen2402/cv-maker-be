@@ -9,4 +9,10 @@ export class TemplateRO {
   }[];
 }
 
+export class SuccessResRO {
+  @ApiProperty()
+  result: string;
 
+  @ApiProperty()
+  statuscode: number;
+}
