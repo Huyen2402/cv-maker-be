@@ -23,7 +23,7 @@ export class TemplateDTO {
   title: string;
 }
 
-export class TemplateBody extends PickType(TemplateDTO, [
+export class TemplateCreateDTO extends PickType(TemplateDTO, [
   'name',
   'title',
   'image',

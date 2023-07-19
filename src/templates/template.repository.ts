@@ -1,6 +1,7 @@
 import { EntityManager, Repository } from 'typeorm';
-import { TemplateEntity } from './template.entity';
 import { Injectable } from '@nestjs/common';
+import { TemplateEntity } from './template.entity';
+import { TemplateCreateDTO } from './dto/template.dto';
 
 @Injectable()
 export class TemplateRepository extends Repository<TemplateEntity> {
@@ -12,24 +13,16 @@ export class TemplateRepository extends Repository<TemplateEntity> {
     return await this.find();
   }
 
-  async addTemplate(body) {
+  async addTemplate(body: TemplateCreateDTO) {
     const template = new TemplateEntity();
     template.image = body.image;
     template.is_deleted = false;
     template.name = body.name;
     template.title = body.title;
-    return await this.emanager.transaction(
-      async (transactionalEntityManager) => {
-        await transactionalEntityManager.save(template);
-      },
-    );
+    return await this.save(template);
   }
-  async checkName() {
-    return await this.find({
-      take: 1,
-      order: {
-        name: 'DESC',
-      },
-    });
+
+  async findByName(name: string) {
+    return await this.findOne({ where: { name, is_deleted: false } });
   }
 }
