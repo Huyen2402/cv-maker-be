@@ -14,4 +14,21 @@ export class TemplateService {
       },
     };
   }
+  async Update(id, template, file){
+    const result = await this.templateRepository.findTemplate(id);
+    const newData = {
+      id: result.id,
+      name: file[0].originalname,
+      title: template.title,
+      is_deleted: result.is_deleted,
+      image: template.image
+    }
+    const update = await this.templateRepository.updateTemplate(newData);
+    return {
+      status: 200,
+      body: {
+        result,
+      },
+    };
+  }
 }
