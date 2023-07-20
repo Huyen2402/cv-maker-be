@@ -4,25 +4,22 @@ import {
   Body,
   Res,
   Get,
-  Query,
   Param,
   Put,
-  UploadedFile,
   UseInterceptors,
   UploadedFiles,
 } from '@nestjs/common';
-import {
-  ApiOkResponse,
-  ApiQuery,
-  ApiParam,
-  ApiConsumes,
-  ApiBody,
-} from '@nestjs/swagger';
+import { ApiOkResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { TemplateService } from '../templates/template.service';
 import { TemplateRO } from '../templates/ro/template.ro';
-import { TemplateBody } from '../templates/dto/template.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import multer, { diskStorage } from 'multer';
+import { diskStorage } from 'multer';
+import { SuccessResRO } from '../templates/ro/template.ro';
+import {
+  TemplateCreateDTO,
+  TemplateUpdateDTO,
+} from '../templates/dto/template.dto';
+
 @Controller('template')
 export class TemplateController {
   constructor(private readonly templateService: TemplateService) {}
@@ -33,8 +30,7 @@ export class TemplateController {
     return res.status(result.status).json(result.body);
   }
 
-  @ApiOkResponse({ type: TemplateRO })
-  @ApiParam({ name: 'id' })
+  @ApiOkResponse({ type: SuccessResRO })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -57,17 +53,51 @@ export class TemplateController {
           cb(null, file.originalname + '.docx');
         },
       }),
-      //   fileFilter: imageFileFilter,
     }),
   )
   @Put('/update/:id')
   async Update(
-    @Body() template: TemplateBody,
+    @Body() template: TemplateUpdateDTO,
     @Res() res,
-    @Param('id') params,
+    @Param('id') id: number,
     @UploadedFiles() file,
   ) {
-    const result = await this.templateService.Update(params, template, file);
+    const result = await this.templateService.Update(id, template, file);
+    return res.status(result.status).json(result.body);
+  }
+
+  @ApiOkResponse({ type: SuccessResRO })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string' },
+        image: { type: 'string' },
+        file_template: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(
+    FilesInterceptor('file_template', 20, {
+      storage: diskStorage({
+        destination: './offline_file/',
+        filename: function (req, file, cb) {
+          cb(null, file.originalname + '.docx');
+        },
+      }),
+    }),
+  )
+  @Post('/add')
+  async create(
+    @Body() body: TemplateCreateDTO,
+    @Res() res,
+    @UploadedFiles() file,
+  ) {
+    const result = await this.templateService.create(body, file[0]);
     return res.status(result.status).json(result.body);
   }
 }
