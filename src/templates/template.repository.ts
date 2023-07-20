@@ -11,4 +11,23 @@ export class TemplateRepository extends Repository<TemplateEntity> {
   async getAllTemplate() {
     return await this.find();
   }
+  async findTemplate(id) {
+    return await this.findOneBy({ id: id });
+  }
+  async updateTemplate(template: TemplateEntity) {
+    return await this.emanager.transaction(
+      async (transactionalEntityManager) => {
+        await transactionalEntityManager
+          .createQueryBuilder()
+          .update(TemplateEntity)
+          .set({
+            name: template.name,
+            title: template.title,
+            image: template.image,
+          })
+          .where({ id: template.id })
+          .execute();
+      },
+    );
+  }
 }
