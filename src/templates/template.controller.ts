@@ -9,7 +9,7 @@ import {
   UseInterceptors,
   UploadedFiles,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { ApiOkResponse, ApiConsumes, ApiBody, ApiTags } from '@nestjs/swagger';
 import { TemplateService } from '../templates/template.service';
 import { TemplateRO } from '../templates/ro/template.ro';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -20,6 +20,7 @@ import {
   TemplateUpdateDTO,
 } from '../templates/dto/template.dto';
 
+@ApiTags('Template')
 @Controller('template')
 export class TemplateController {
   constructor(private readonly templateService: TemplateService) {}
