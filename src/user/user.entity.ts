@@ -17,11 +17,11 @@ export class UserEntity {
   @Column({ length: 45 })
   phone: string;
 
-  @Column()
+  @Column({ type: 'date' })
   dob: Date;
 
   @Column({ name: 'is_deleted' })
-  isDeleted: Date;
+  isDeleted: boolean;
 
   // @OneToMany('User_login', (user_login: UserLoginEntity) => user_login.user)
   // user_login: UserLoginEntity[];
