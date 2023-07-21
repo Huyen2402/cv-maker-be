@@ -6,6 +6,7 @@ import {
   Get,
   Param,
   Put,
+  Delete,
   UseInterceptors,
   UploadedFiles,
 } from '@nestjs/common';
@@ -99,6 +100,12 @@ export class TemplateController {
     @UploadedFiles() file,
   ) {
     const result = await this.templateService.create(body, file[0]);
+    return res.status(result.status).json(result.body);
+  }
+
+  @Delete('/delete:id')
+  async delete(@Res() res, @Param('id') id: number) {
+    const result = await this.templateService.delete(id);
     return res.status(result.status).json(result.body);
   }
 }

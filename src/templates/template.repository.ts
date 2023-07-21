@@ -44,4 +44,18 @@ export class TemplateRepository extends Repository<TemplateEntity> {
   async findByName(name: string) {
     return await this.findOne({ where: { name, is_deleted: false } });
   }
+  async deleleTemplate(template){
+    return await this.emanager.transaction(
+      async (transactionalEntityManager) => {
+        await transactionalEntityManager
+          .createQueryBuilder()
+          .update(TemplateEntity)
+          .set({
+            is_deleted: true,
+          })
+          .where({ id: template.id })
+          .execute();
+      },
+    );
+  }
 }

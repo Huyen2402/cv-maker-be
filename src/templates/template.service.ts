@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { TemplateRepository } from '../templates/template.repository';
 import { TemplateCreateDTO } from './dto/template.dto';
-
+import { _ } from 'lodash';
 @Injectable()
 export class TemplateService {
   constructor(private readonly templateRepository: TemplateRepository) {}
@@ -66,6 +66,36 @@ export class TemplateService {
     // Response success
     return {
       status: HttpStatus.CREATED,
+      body: {
+        result: true,
+      },
+    };
+  }
+
+  async delete(id) {
+    const result = await this.templateRepository.findTemplate(id);
+    if (_.isNil(result)) {
+      return {
+        status: HttpStatus.NOT_FOUND,
+        body: {
+          result: false,
+          message: 'Field name has exist!',
+        },
+      };
+    }
+    const deleteResult = this.templateRepository.deleleTemplate(result);
+    if (!deleteResult) {
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        body: {
+          result: false,
+        },
+      };
+    }
+
+    // Response success
+    return {
+      status: HttpStatus.OK,
       body: {
         result: true,
       },
