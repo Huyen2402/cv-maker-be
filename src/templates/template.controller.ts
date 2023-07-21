@@ -59,12 +59,12 @@ export class TemplateController {
   )
   @Put('/update/:id')
   async Update(
-    @Body() template: TemplateUpdateDTO,
+    @Body() body: TemplateUpdateDTO,
     @Res() res,
     @Param('id') id: number,
     @UploadedFiles() file,
   ) {
-    const result = await this.templateService.Update(id, template, file);
+    const result = await this.templateService.update(id, body, file);
     return res.status(result.status).json(result.body);
   }
 

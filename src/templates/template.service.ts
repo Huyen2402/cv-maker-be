@@ -1,13 +1,13 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { TemplateRepository } from '../templates/template.repository';
-import { TemplateCreateDTO } from './dto/template.dto';
+import { TemplateCreateDTO, TemplateUpdateDTO } from './dto/template.dto';
 import { _ } from 'lodash';
 @Injectable()
 export class TemplateService {
   constructor(private readonly templateRepository: TemplateRepository) {}
 
   async GetAll() {
-    const result = await this.templateRepository.getAllTemplate();
+    const result = await this.templateRepository.findAll();
     return {
       status: 200,
       body: {
@@ -15,18 +15,29 @@ export class TemplateService {
       },
     };
   }
-  async Update(id, template, file) {
-    const result = await this.templateRepository.findTemplate(id);
+  async update(id: number, data: TemplateUpdateDTO, file) {
+    const result = await this.templateRepository.findOneById(id);
     const newData = {
       id: result.id,
       name: file[0].originalname,
-      title: template.title,
+      title: data.title,
       is_deleted: result.is_deleted,
-      image: template.image,
+      image: data.image,
     };
-    const update = await this.templateRepository.updateTemplate(newData);
+
+    try {
+      await this.templateRepository.edit(newData);
+    } catch (error) {
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        body: {
+          message: 'Error',
+        },
+      };
+    }
+
     return {
-      status: 200,
+      status: HttpStatus.OK,
       body: {
         result,
       },
@@ -53,7 +64,7 @@ export class TemplateService {
     };
 
     // Insert template
-    const resultCreate = await this.templateRepository.addTemplate(body);
+    const resultCreate = await this.templateRepository.add(body);
     if (!resultCreate) {
       return {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -72,18 +83,19 @@ export class TemplateService {
     };
   }
 
-  async delete(id) {
-    const result = await this.templateRepository.findTemplate(id);
+  async delete(id: number) {
+    const result = await this.templateRepository.findOneById(id);
     if (_.isNil(result)) {
       return {
-        status: HttpStatus.NOT_FOUND,
+        status: HttpStatus.BAD_REQUEST,
         body: {
           result: false,
-          message: 'Field name has exist!',
+          message: 'Template is not exist!',
         },
       };
     }
-    const deleteResult = this.templateRepository.deleleTemplate(result);
+
+    const deleteResult = this.templateRepository.deleleById(id);
     if (!deleteResult) {
       return {
         status: HttpStatus.INTERNAL_SERVER_ERROR,

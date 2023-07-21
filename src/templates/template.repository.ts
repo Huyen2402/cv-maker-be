@@ -9,13 +9,18 @@ export class TemplateRepository extends Repository<TemplateEntity> {
     super(TemplateEntity, emanager);
   }
 
-  async getAllTemplate() {
-    return await this.find();
+  async findAll() {
+    return await this.find({
+      select: ['id', 'title', 'name', 'image'],
+      where: { is_deleted: false },
+    });
   }
-  async findTemplate(id) {
-    return await this.findOneBy({ id: id });
+
+  async findOneById(id: number) {
+    return await this.findOneBy({ id, is_deleted: false });
   }
-  async updateTemplate(template: TemplateEntity) {
+
+  async edit(template: TemplateEntity) {
     return await this.emanager.transaction(
       async (transactionalEntityManager) => {
         await transactionalEntityManager
@@ -32,7 +37,7 @@ export class TemplateRepository extends Repository<TemplateEntity> {
     );
   }
 
-  async addTemplate(body: TemplateCreateDTO) {
+  async add(body: TemplateCreateDTO) {
     const template = new TemplateEntity();
     template.image = body.image;
     template.is_deleted = false;
@@ -44,7 +49,8 @@ export class TemplateRepository extends Repository<TemplateEntity> {
   async findByName(name: string) {
     return await this.findOne({ where: { name, is_deleted: false } });
   }
-  async deleleTemplate(template){
+
+  async deleleById(id: number) {
     return await this.emanager.transaction(
       async (transactionalEntityManager) => {
         await transactionalEntityManager
@@ -53,7 +59,7 @@ export class TemplateRepository extends Repository<TemplateEntity> {
           .set({
             is_deleted: true,
           })
-          .where({ id: template.id })
+          .where({ id })
           .execute();
       },
     );
