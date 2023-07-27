@@ -63,11 +63,15 @@ export class TemplateController {
   )
   @Put('/update/:id')
   async Update(
-    @Body() body: TemplateUpdateDTO,
+    @Body() body: TemplateUpdateDTO, 
     @Res() res,
     @Param('id') id: number,
     @UploadedFiles() file,
   ) {
+    const resultUpload = await this.s3Service.S3UploadV2(file[0]);
+    if (!resultUpload) {
+      return res.status(404).json();
+    }
     const result = await this.templateService.update(id, body, file);
     return res.status(result.status).json(result.body);
   }

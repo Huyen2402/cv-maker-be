@@ -39,7 +39,7 @@ export class TemplateService {
     return {
       status: HttpStatus.OK,
       body: {
-        result,
+        result: true,
       },
     };
   }
