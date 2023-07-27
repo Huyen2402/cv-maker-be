@@ -9,7 +9,6 @@ async function bootstrap() {
     .setTitle('CV Maker API')
     .setDescription('Description...')
     .setVersion('1.0')
-    .addTag('user')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

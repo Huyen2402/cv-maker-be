@@ -8,3 +8,11 @@ export class TemplateRO {
     image: string;
   }[];
 }
+
+export class SuccessResRO {
+  @ApiProperty()
+  result: string;
+
+  @ApiProperty()
+  statuscode: number;
+}

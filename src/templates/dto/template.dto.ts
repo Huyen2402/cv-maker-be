@@ -1,4 +1,9 @@
-import { IsBoolean, IsNumber, IsString } from '@nestjs/class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from '@nestjs/class-validator';
 import { ApiProperty, PickType } from '@nestjs/swagger';
 
 export class TemplateDTO {
@@ -8,10 +13,12 @@ export class TemplateDTO {
 
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   image: string;
 
   @ApiProperty()
@@ -20,5 +27,14 @@ export class TemplateDTO {
 
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   title: string;
 }
+
+export class TemplateCreateDTO extends PickType(TemplateDTO, [
+  'name',
+  'title',
+  'image',
+] as const) {}
+
+export class TemplateUpdateDTO extends TemplateCreateDTO {}

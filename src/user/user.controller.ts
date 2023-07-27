@@ -1,9 +1,10 @@
 import { Controller, Post, Body, Res, Get } from '@nestjs/common';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UserLoginDTO, UserRefreshTokenDTO } from '../user/dto/user.dto';
 import { UserLoginRO } from '../user/ro/user.ro';
 
+@ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -11,7 +12,6 @@ export class UserController {
   @ApiOkResponse({ type: UserLoginRO })
   @Post('/login')
   async create(@Body() user: UserLoginDTO, @Res() res) {
-    console.log(user);
     
     const result = await this.userService.login(user.email, user.password);
     return res.status(result.status).json(result.body);
