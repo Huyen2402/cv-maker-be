@@ -35,7 +35,7 @@ export class TemplateService {
 
   async create(body: TemplateCreateDTO, file) {
     // Check name exist
-    const templateFound = await this.templateRepository.findByName(body.name);
+    const templateFound = await this.templateRepository.findByName(body.title);
     if (templateFound) {
       return {
         status: HttpStatus.BAD_REQUEST,
@@ -101,4 +101,5 @@ export class TemplateService {
       },
     };
   }
+
 }
