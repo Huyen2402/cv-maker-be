@@ -43,7 +43,6 @@ export class TemplateService extends BaseService {
       name: key,
       title: template.title,
       isDeleted: templateFound.isDeleted,
-      image: template.image,
     };
 
     await this.templateRepository.manager.transaction(
@@ -62,10 +61,12 @@ export class TemplateService extends BaseService {
             await transactionalEntityManager.queryRunner.rollbackTransaction();
           } else {
             result = true;
+            unlinkSync(file.path);
             await transactionalEntityManager.queryRunner.commitTransaction();
           }
         } catch (error) {
           console.log(error);
+          unlinkSync(file.path);
           await transactionalEntityManager.queryRunner.rollbackTransaction();
         }
       },

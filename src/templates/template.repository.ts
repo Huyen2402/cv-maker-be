@@ -10,7 +10,7 @@ export class TemplateRepository extends Repository<TemplateEntity> {
 
   async findAll() {
     return await this.find({
-      select: ['id', 'title', 'name', 'image'],
+      select: ['id', 'title', 'name'],
       where: { isDeleted: false },
     });
   }
@@ -19,20 +19,19 @@ export class TemplateRepository extends Repository<TemplateEntity> {
     return await this.findOneBy({ id: id });
   }
 
-  async updateTemplate(template: TemplateEntity) {
-    return await this.emanager.transaction(
-      async (transactionalEntityManager) => {
-        await transactionalEntityManager
-          .createQueryBuilder()
-          .update(TemplateEntity)
-          .set({
-            name: template.name,
-            title: template.title,
-          })
-          .where({ id: template.id })
-          .execute();
-      },
-    );
+  async updateTemplateWithTransaction(
+    queryRunner: QueryRunner,
+    template: TemplateEntity,
+  ) {
+    return await queryRunner.manager
+      .createQueryBuilder()
+      .update(TemplateEntity)
+      .set({
+        name: template.name,
+        title: template.title,
+      })
+      .where({ id: template.id })
+      .execute();
   }
 
   async addTemplateWithTransaction(
