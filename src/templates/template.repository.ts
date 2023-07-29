@@ -1,4 +1,4 @@
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, QueryRunner, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { TemplateEntity } from './template.entity';
 import { TemplateCreateDTO } from './dto/template.dto';
@@ -12,15 +12,15 @@ export class TemplateRepository extends Repository<TemplateEntity> {
   async findAll() {
     return await this.find({
       select: ['id', 'title', 'name', 'image'],
-      where: { is_deleted: false },
+      where: { isDeleted: false },
     });
   }
 
-  async findOneById(id: number) {
-    return await this.findOneBy({ id, is_deleted: false });
+  async findTemplate(id) {
+    return await this.findOneBy({ id: id });
   }
 
-  async edit(template: TemplateEntity) {
+  async updateTemplate(template: TemplateEntity) {
     return await this.emanager.transaction(
       async (transactionalEntityManager) => {
         await transactionalEntityManager
@@ -37,17 +37,15 @@ export class TemplateRepository extends Repository<TemplateEntity> {
     );
   }
 
-  async add(body: TemplateCreateDTO) {
-    const template = new TemplateEntity();
-    template.image = body.image;
-    template.is_deleted = false;
-    template.name = body.name;
-    template.title = body.title;
-    return await this.save(template);
+  async addTemplateWithTransaction(
+    queryRunner: QueryRunner,
+    body: TemplateCreateDTO,
+  ) {
+    return await queryRunner.manager.save(TemplateEntity, body);
   }
 
   async findByName(name: string) {
-    return await this.findOne({ where: { name, is_deleted: false } });
+    return await this.findOne({ where: { name, isDeleted: false } });
   }
 
   async deleleById(id: number) {

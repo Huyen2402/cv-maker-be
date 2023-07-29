@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('templates')
 export class TemplateEntity {
@@ -11,8 +11,8 @@ export class TemplateEntity {
   @Column({ length: 255 })
   image: string;
 
-  @Column()
-  is_deleted: boolean;
+  @Column({ name: 'is_deleted' })
+  isDeleted: boolean;
 
   @Column({ length: 255 })
   title: string;

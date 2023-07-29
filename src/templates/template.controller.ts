@@ -20,15 +20,11 @@ import {
   TemplateCreateDTO,
   TemplateUpdateDTO,
 } from '../templates/dto/template.dto';
-import { S3Service } from 'src/common/s3.service';
 
 @ApiTags('Template')
 @Controller('template')
 export class TemplateController {
-  constructor(
-    private readonly templateService: TemplateService,
-    private readonly s3Service: S3Service,
-  ) {}
+  constructor(private readonly templateService: TemplateService) {}
   @ApiOkResponse({ type: TemplateRO })
   @Get('/get-all-templates')
   async GetAll(@Res() res) {
@@ -68,10 +64,6 @@ export class TemplateController {
     @Param('id') id: number,
     @UploadedFiles() file,
   ) {
-    const resultUpload = await this.s3Service.S3UploadV2(file[0]);
-    if (!resultUpload) {
-      return res.status(404).json();
-    }
     const result = await this.templateService.update(id, body, file);
     return res.status(result.status).json(result.body);
   }
@@ -107,10 +99,6 @@ export class TemplateController {
     @Res() res,
     @UploadedFiles() file,
   ) {
-    const resultUpload = await this.s3Service.S3UploadV2(file[0]);
-    if (!resultUpload) {
-      return res.status(404).json();
-    }
     const result = await this.templateService.create(body, file[0]);
     return res.status(result.status).json(result.body);
   }

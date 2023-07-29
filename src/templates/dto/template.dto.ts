@@ -23,7 +23,7 @@ export class TemplateDTO {
 
   @ApiProperty()
   @IsBoolean()
-  is_deleted: boolean;
+  isDeleted: boolean;
 
   @ApiProperty()
   @IsString()
