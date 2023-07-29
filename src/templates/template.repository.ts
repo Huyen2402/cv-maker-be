@@ -1,7 +1,6 @@
 import { EntityManager, QueryRunner, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { TemplateEntity } from './template.entity';
-import { TemplateCreateDTO } from './dto/template.dto';
 
 @Injectable()
 export class TemplateRepository extends Repository<TemplateEntity> {
@@ -11,7 +10,7 @@ export class TemplateRepository extends Repository<TemplateEntity> {
 
   async findAll() {
     return await this.find({
-      select: ['id', 'title', 'name', 'image'],
+      select: ['id', 'title', 'name'],
       where: { isDeleted: false },
     });
   }
@@ -30,7 +29,6 @@ export class TemplateRepository extends Repository<TemplateEntity> {
       .set({
         name: template.name,
         title: template.title,
-        image: template.image,
       })
       .where({ id: template.id })
       .execute();

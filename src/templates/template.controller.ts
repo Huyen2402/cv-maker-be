@@ -39,7 +39,6 @@ export class TemplateController {
       type: 'object',
       properties: {
         title: { type: 'string' },
-        image: { type: 'string' },
         file_template: {
           type: 'string',
           format: 'binary',
@@ -59,7 +58,7 @@ export class TemplateController {
   )
   @Put('/update/:id')
   async Update(
-    @Body() body: TemplateUpdateDTO, 
+    @Body() body: TemplateUpdateDTO,
     @Res() res,
     @Param('id') id: number,
     @UploadedFiles() file,
@@ -75,7 +74,6 @@ export class TemplateController {
       type: 'object',
       properties: {
         title: { type: 'string' },
-        image: { type: 'string' },
         file_template: {
           type: 'string',
           format: 'binary',

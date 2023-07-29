@@ -1,4 +1,5 @@
 import { _ } from 'lodash';
+import { unlinkSync } from 'fs';
 import * as moment from 'moment';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { TemplateRepository } from '../templates/template.repository';
@@ -42,7 +43,6 @@ export class TemplateService extends BaseService {
       name: key,
       title: template.title,
       isDeleted: templateFound.isDeleted,
-      image: template.image,
     };
 
     await this.templateRepository.manager.transaction(
@@ -61,10 +61,12 @@ export class TemplateService extends BaseService {
             await transactionalEntityManager.queryRunner.rollbackTransaction();
           } else {
             result = true;
+            unlinkSync(file.path);
             await transactionalEntityManager.queryRunner.commitTransaction();
           }
         } catch (error) {
           console.log(error);
+          unlinkSync(file.path);
           await transactionalEntityManager.queryRunner.rollbackTransaction();
         }
       },
@@ -95,17 +97,11 @@ export class TemplateService extends BaseService {
       async (transactionalEntityManager) => {
         await transactionalEntityManager.queryRunner.startTransaction();
         try {
-          // Format data
-          body = {
-            ...body,
-            name: file.originalname,
-          };
           const key = `uploads/${moment(Date()).format(
             'MM_DD_YYYY_hh_mm_ss',
           )}_${file.originalname}`;
 
           const template = new TemplateEntity();
-          template.image = body.image;
           template.isDeleted = false;
           template.name = key;
           template.title = body.title;
@@ -122,10 +118,12 @@ export class TemplateService extends BaseService {
             await transactionalEntityManager.queryRunner.rollbackTransaction();
           } else {
             result = true;
+            unlinkSync(file.path);
             await transactionalEntityManager.queryRunner.commitTransaction();
           }
         } catch (error) {
           console.log(error);
+          unlinkSync(file.path);
           await transactionalEntityManager.queryRunner.rollbackTransaction();
         }
       },
