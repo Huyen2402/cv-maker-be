@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TemplateRepository } from '../templates/template.repository';
 import { TemplateService } from '../templates/template.service';
 import { TemplateController } from '../templates/template.controller';
-import { S3Service } from 'src/common/s3.service';
+import { S3Service } from 'src/services/s3.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([TemplateRepository])],

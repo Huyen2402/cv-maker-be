@@ -1,10 +1,20 @@
+import { _ } from 'lodash';
+import * as moment from 'moment';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { TemplateRepository } from '../templates/template.repository';
+import { S3Service } from 'src/services/s3.service';
 import { TemplateCreateDTO } from './dto/template.dto';
-import { _ } from 'lodash';
+import { TemplateEntity } from './template.entity';
+import { BaseService } from 'src/services/base.service';
+
 @Injectable()
-export class TemplateService {
-  constructor(private readonly templateRepository: TemplateRepository) {}
+export class TemplateService extends BaseService {
+  constructor(
+    private readonly templateRepository: TemplateRepository,
+    private readonly s3Service: S3Service,
+  ) {
+    super();
+  }
 
   async GetAll() {
     const result = await this.templateRepository.getAllTemplate();
@@ -21,7 +31,7 @@ export class TemplateService {
       id: result.id,
       name: file[0].originalname,
       title: template.title,
-      is_deleted: result.is_deleted,
+      isDeleted: result.isDeleted,
       image: template.image,
     };
     const update = await this.templateRepository.updateTemplate(newData);
@@ -46,30 +56,52 @@ export class TemplateService {
       };
     }
 
-    // Format data
-    body = {
-      ...body,
-      name: file.originalname,
-    };
+    let result = false;
+    await this.templateRepository.manager.transaction(
+      async (transactionalEntityManager) => {
+        await transactionalEntityManager.queryRunner.startTransaction();
+        try {
+          // Format data
+          body = {
+            ...body,
+            name: file.originalname,
+          };
+          const key = `uploads/${moment(Date()).format(
+            'MM_DD_YYYY_hh_mm_ss',
+          )}_${file.originalname}`;
 
-    // Insert template
-    const resultCreate = await this.templateRepository.addTemplate(body);
-    if (!resultCreate) {
-      return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        body: {
-          result: false,
-        },
-      };
-    }
+          const template = new TemplateEntity();
+          template.image = body.image;
+          template.isDeleted = false;
+          template.name = key;
+          template.title = body.title;
 
-    // Response success
-    return {
-      status: HttpStatus.CREATED,
-      body: {
-        result: true,
+          // Insert template
+          await this.templateRepository.addTemplateWithTransaction(
+            transactionalEntityManager.queryRunner,
+            template,
+          );
+
+          // Upload S3
+          const resultUpload = await this.s3Service.S3UploadV2(file, key);
+          if (!resultUpload) {
+            await transactionalEntityManager.queryRunner.rollbackTransaction();
+          } else {
+            result = true;
+            await transactionalEntityManager.queryRunner.commitTransaction();
+          }
+        } catch (error) {
+          console.log(error);
+          await transactionalEntityManager.queryRunner.rollbackTransaction();
+        }
       },
-    };
+    );
+
+    // Response
+    return this.formatData(
+      result ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST,
+      result,
+    );
   }
 
   async delete(id) {
@@ -101,5 +133,4 @@ export class TemplateService {
       },
     };
   }
-
 }
