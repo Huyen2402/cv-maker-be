@@ -64,7 +64,7 @@ export class TemplateController {
     @Param('id') id: number,
     @UploadedFiles() file,
   ) {
-    const result = await this.templateService.update(id, body, file);
+    const result = await this.templateService.update(id, body, file[0]);
     return res.status(result.status).json(result.body);
   }
 

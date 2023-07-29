@@ -25,33 +25,56 @@ export class TemplateService extends BaseService {
       },
     };
   }
+
   async update(id: number, template: TemplateUpdateDTO, file) {
-    const result = await this.templateRepository.findOneById(id);
+    let result = false;
+    const templateFound = await this.templateRepository.findOneById(id);
+    if (!templateFound) {
+      HttpStatus.BAD_REQUEST, { result };
+    }
+
+    // Format data
+    const key = `uploads/${moment(Date()).format('MM_DD_YYYY_hh_mm_ss')}_${
+      file.originalname
+    }`;
     const newData = {
-      id: result.id,
-      name: file[0].originalname,
+      id: templateFound.id,
+      name: key,
       title: template.title,
-      isDeleted: result.isDeleted,
+      isDeleted: templateFound.isDeleted,
       image: template.image,
     };
 
-    try {
-      await this.templateRepository.updateTemplate(newData);
-    } catch (error) {
-      return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        body: {
-          message: 'Error',
-        },
-      };
-    }
+    await this.templateRepository.manager.transaction(
+      async (transactionalEntityManager) => {
+        await transactionalEntityManager.queryRunner.startTransaction();
+        try {
+          // Update template
+          await this.templateRepository.updateTemplateWithTransaction(
+            transactionalEntityManager.queryRunner,
+            newData,
+          );
 
-    return {
-      status: HttpStatus.OK,
-      body: {
-        result: true,
+          // Upload S3
+          const resultUpload = await this.s3Service.S3UploadV2(file, key);
+          if (!resultUpload) {
+            await transactionalEntityManager.queryRunner.rollbackTransaction();
+          } else {
+            result = true;
+            await transactionalEntityManager.queryRunner.commitTransaction();
+          }
+        } catch (error) {
+          console.log(error);
+          await transactionalEntityManager.queryRunner.rollbackTransaction();
+        }
       },
-    };
+    );
+
+    // Response
+    return this.formatData(
+      result ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST,
+      result,
+    );
   }
 
   async create(body: TemplateCreateDTO, file) {
