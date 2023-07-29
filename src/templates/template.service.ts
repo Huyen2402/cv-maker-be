@@ -83,9 +83,9 @@ export class TemplateService extends BaseService {
             await transactionalEntityManager.queryRunner.rollbackTransaction();
           } else {
             result = true;
-            unlinkSync(file.path);
             await transactionalEntityManager.queryRunner.commitTransaction();
           }
+          unlinkSync(file.path);
         } catch (error) {
           console.log(error);
           unlinkSync(file.path);
