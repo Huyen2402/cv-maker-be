@@ -1,7 +1,6 @@
 import { EntityManager, QueryRunner, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { TemplateEntity } from './template.entity';
-import { TemplateCreateDTO } from './dto/template.dto';
 
 @Injectable()
 export class TemplateRepository extends Repository<TemplateEntity> {
@@ -20,20 +19,20 @@ export class TemplateRepository extends Repository<TemplateEntity> {
     return await this.findOneBy({ id: id });
   }
 
-  async updateTemplateWithTransaction(
-    queryRunner: QueryRunner,
-    template: TemplateEntity,
-  ) {
-    return await queryRunner.manager
-      .createQueryBuilder()
-      .update(TemplateEntity)
-      .set({
-        name: template.name,
-        title: template.title,
-        image: template.image,
-      })
-      .where({ id: template.id })
-      .execute();
+  async updateTemplate(template: TemplateEntity) {
+    return await this.emanager.transaction(
+      async (transactionalEntityManager) => {
+        await transactionalEntityManager
+          .createQueryBuilder()
+          .update(TemplateEntity)
+          .set({
+            name: template.name,
+            title: template.title,
+          })
+          .where({ id: template.id })
+          .execute();
+      },
+    );
   }
 
   async addTemplateWithTransaction(

@@ -75,7 +75,6 @@ export class TemplateController {
       type: 'object',
       properties: {
         title: { type: 'string' },
-        image: { type: 'string' },
         file_template: {
           type: 'string',
           format: 'binary',
