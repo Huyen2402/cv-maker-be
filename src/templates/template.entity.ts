@@ -8,9 +8,6 @@ export class TemplateEntity {
   @Column({ length: 255 })
   name: string;
 
-  @Column({ length: 255 })
-  image: string;
-
   @Column({ name: 'is_deleted' })
   isDeleted: boolean;
 

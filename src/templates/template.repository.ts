@@ -26,7 +26,6 @@ export class TemplateRepository extends Repository<TemplateEntity> {
           .set({
             name: template.name,
             title: template.title,
-            image: template.image,
           })
           .where({ id: template.id })
           .execute();
