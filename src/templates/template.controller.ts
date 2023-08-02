@@ -51,14 +51,20 @@ export class TemplateController {
     },
   })
   @UseInterceptors(
-    FilesInterceptor('file_template', 20, {
-      storage: diskStorage({
-        destination: './offline_file/',
-        filename: function (req, file, cb) {
-          cb(null, file.originalname + '.docx');
-        },
-      }),
-    }),
+    FileFieldsInterceptor(
+      [
+        { name: 'image', maxCount: 1 },
+        { name: 'file_template', maxCount: 1 },
+      ],
+      {
+        storage: diskStorage({
+          destination: './offline_file/',
+          filename: function (req, file, cb) {
+            cb(null, file.originalname);
+          },
+        }),
+      },
+    ),
   )
   @Put('/update/:id')
   async Update(
@@ -67,7 +73,7 @@ export class TemplateController {
     @Param('id') id: number,
     @UploadedFiles() file,
   ) {
-    const result = await this.templateService.update(id, body, file[0]);
+    const result = await this.templateService.update(id, body, file);
     return res.status(result.status).json(result.body);
   }
 

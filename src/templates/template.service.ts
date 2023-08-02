@@ -35,13 +35,16 @@ export class TemplateService extends BaseService {
     }
 
     // Format data
-    const key = `uploads/${moment(Date()).format('MM_DD_YYYY_hh_mm_ss')}_${
-      file.originalname
+    const keyFile = `uploads/${moment(Date()).format('MM_DD_YYYY_hh_mm_ss')}_${
+      file.file_template[0].originalname
+    }`;
+    const keyImage = `uploads/${moment(Date()).format('MM_DD_YYYY_hh_mm_ss')}_${
+      file.image[0].originalname
     }`;
     const newData = {
       id: templateFound.id,
-      name: key,
-      image: template.image === '' ? templateFound.image : template.image,
+      name: keyFile,
+      image: keyImage === '' ? templateFound.image : keyImage,
       title: template.title === '' ? templateFound.title : template.title,
       isDeleted: templateFound.isDeleted,
     };
@@ -57,17 +60,20 @@ export class TemplateService extends BaseService {
           );
 
           // Upload S3
-          const resultUpload = await this.s3Service.S3UploadV2(file, key);
-          if (!resultUpload) {
+          const resultUpload = await this.s3Service.S3UploadV2(file, keyFile);
+          const resultImage = await this.s3Service.S3UploadV2(file, keyImage);
+          if (!resultUpload || !resultImage) {
             await transactionalEntityManager.queryRunner.rollbackTransaction();
           } else {
             result = true;
             await transactionalEntityManager.queryRunner.commitTransaction();
           }
-          unlinkSync(file.path);
+          unlinkSync(file.file_template[0].path);
+          unlinkSync(file.image[0].path);
         } catch (error) {
           console.log(error);
-          unlinkSync(file.path);
+          unlinkSync(file.file_template[0].path);
+          unlinkSync(file.image[0].path);
           await transactionalEntityManager.queryRunner.rollbackTransaction();
         }
       },
