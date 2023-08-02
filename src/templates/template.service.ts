@@ -41,7 +41,8 @@ export class TemplateService extends BaseService {
     const newData = {
       id: templateFound.id,
       name: key,
-      title: template.title,
+      image: template.image === '' ? templateFound.image : template.image,
+      title: template.title === '' ? templateFound.title : template.title,
       isDeleted: templateFound.isDeleted,
     };
 
@@ -79,7 +80,7 @@ export class TemplateService extends BaseService {
     );
   }
 
-  async create(body: TemplateCreateDTO, file) {
+  async create(body: TemplateCreateDTO, file, image) {
     // Check name exist
     const templateFound = await this.templateRepository.findByName(body.title);
     if (templateFound) {
@@ -97,13 +98,17 @@ export class TemplateService extends BaseService {
       async (transactionalEntityManager) => {
         await transactionalEntityManager.queryRunner.startTransaction();
         try {
-          const key = `uploads/${moment(Date()).format(
+          const keyFile = `uploads/${moment(Date()).format(
             'MM_DD_YYYY_hh_mm_ss',
           )}_${file.originalname}`;
 
+          const keyImage = `uploads/${moment(Date()).format(
+            'MM_DD_YYYY_hh_mm_ss',
+          )}_${image.originalname}`;
           const template = new TemplateEntity();
           template.isDeleted = false;
-          template.name = key;
+          template.name = keyFile;
+          template.image = keyImage;
           template.title = body.title;
 
           // Insert template
@@ -113,17 +118,20 @@ export class TemplateService extends BaseService {
           );
 
           // Upload S3
-          const resultUpload = await this.s3Service.S3UploadV2(file, key);
-          if (!resultUpload) {
+          const resultUpload = await this.s3Service.S3UploadV2(file, keyFile);
+          const resultImage = await this.s3Service.S3UploadV2(image, keyImage);
+          if (!resultUpload || !resultImage) {
             await transactionalEntityManager.queryRunner.rollbackTransaction();
           } else {
             result = true;
             await transactionalEntityManager.queryRunner.commitTransaction();
           }
           unlinkSync(file.path);
+          unlinkSync(image.path);
         } catch (error) {
           console.log(error);
           unlinkSync(file.path);
+          unlinkSync(image.path);
           await transactionalEntityManager.queryRunner.rollbackTransaction();
         }
       },

@@ -13,7 +13,10 @@ import {
 import { ApiOkResponse, ApiConsumes, ApiBody, ApiTags } from '@nestjs/swagger';
 import { TemplateService } from '../templates/template.service';
 import { TemplateRO } from '../templates/ro/template.ro';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import {
+  FilesInterceptor,
+  FileFieldsInterceptor,
+} from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { SuccessResRO } from '../templates/ro/template.ro';
 import {
@@ -39,6 +42,7 @@ export class TemplateController {
       type: 'object',
       properties: {
         title: { type: 'string' },
+        image: { type: 'string' },
         file_template: {
           type: 'string',
           format: 'binary',
@@ -74,6 +78,7 @@ export class TemplateController {
       type: 'object',
       properties: {
         title: { type: 'string' },
+        image: { type: 'string', format: 'binary' },
         file_template: {
           type: 'string',
           format: 'binary',
@@ -82,14 +87,20 @@ export class TemplateController {
     },
   })
   @UseInterceptors(
-    FilesInterceptor('file_template', 20, {
-      storage: diskStorage({
-        destination: './offline_file/',
-        filename: function (req, file, cb) {
-          cb(null, file.originalname + '.docx');
-        },
-      }),
-    }),
+    FileFieldsInterceptor(
+      [
+        { name: 'image', maxCount: 1 },
+        { name: 'file_template', maxCount: 1 },
+      ],
+      {
+        storage: diskStorage({
+          destination: './offline_file/',
+          filename: function (req, file, cb) {
+            cb(null, file.originalname);
+          },
+        }),
+      },
+    ),
   )
   @Post('/add')
   async create(
@@ -97,7 +108,12 @@ export class TemplateController {
     @Res() res,
     @UploadedFiles() file,
   ) {
-    const result = await this.templateService.create(body, file[0]);
+    console.log(file);
+    const result = await this.templateService.create(
+      body,
+      file.file_template[0],
+      file.image[0],
+    );
     return res.status(result.status).json(result.body);
   }
 

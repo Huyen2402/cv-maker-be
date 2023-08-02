@@ -17,6 +17,11 @@ export class TemplateDTO {
   name: string;
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  image: string;
+
+  @ApiProperty()
   @IsBoolean()
   isDeleted: boolean;
 
@@ -28,6 +33,7 @@ export class TemplateDTO {
 
 export class TemplateCreateDTO extends PickType(TemplateDTO, [
   'title',
+  'image',
 ] as const) {}
 
 export class TemplateUpdateDTO extends TemplateCreateDTO {}
