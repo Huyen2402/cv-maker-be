@@ -10,7 +10,7 @@ export class TemplateRepository extends Repository<TemplateEntity> {
 
   async findAll() {
     return await this.find({
-      select: ['id', 'title', 'name'],
+      select: ['id', 'title', 'name', 'image'],
       where: { isDeleted: false },
     });
   }
@@ -29,6 +29,7 @@ export class TemplateRepository extends Repository<TemplateEntity> {
       .set({
         name: template.name,
         title: template.title,
+        image: template.image,
       })
       .where({ id: template.id })
       .execute();

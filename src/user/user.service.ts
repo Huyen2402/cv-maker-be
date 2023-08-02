@@ -4,6 +4,7 @@ import { UserLoginRepository } from '../user_login/user_login.repository';
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { debug } from 'console';
 
 @Injectable()
 export class UserService {
@@ -18,7 +19,9 @@ export class UserService {
     if (_.isNil(emailFound)) {
       return { status: 404, body: { message: 'Email not found!' } };
     }
-
+    const saltOrRounds = 9;
+    const hash = await bcrypt.hash(password, saltOrRounds);
+    debug('hash: ', hash) ;
     const match = await bcrypt.compare(password, emailFound.password);
     console.log(match);
     if (!match) {
