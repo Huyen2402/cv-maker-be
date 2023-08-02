@@ -23,7 +23,7 @@ export class TemplateDTO {
 
   @ApiProperty()
   @IsBoolean()
-  is_deleted: boolean;
+  isDeleted: boolean;
 
   @ApiProperty()
   @IsString()
@@ -32,7 +32,6 @@ export class TemplateDTO {
 }
 
 export class TemplateCreateDTO extends PickType(TemplateDTO, [
-  'name',
   'title',
   'image',
 ] as const) {}

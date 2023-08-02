@@ -1,7 +1,6 @@
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, QueryRunner, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { TemplateEntity } from './template.entity';
-import { TemplateCreateDTO } from './dto/template.dto';
 
 @Injectable()
 export class TemplateRepository extends Repository<TemplateEntity> {
@@ -12,42 +11,39 @@ export class TemplateRepository extends Repository<TemplateEntity> {
   async findAll() {
     return await this.find({
       select: ['id', 'title', 'name', 'image'],
-      where: { is_deleted: false },
+      where: { isDeleted: false },
     });
   }
 
-  async findOneById(id: number) {
-    return await this.findOneBy({ id, is_deleted: false });
+  async findTemplate(id) {
+    return await this.findOneBy({ id: id });
   }
 
-  async edit(template: TemplateEntity) {
-    return await this.emanager.transaction(
-      async (transactionalEntityManager) => {
-        await transactionalEntityManager
-          .createQueryBuilder()
-          .update(TemplateEntity)
-          .set({
-            name: template.name,
-            title: template.title,
-            image: template.image,
-          })
-          .where({ id: template.id })
-          .execute();
-      },
-    );
+  async updateTemplateWithTransaction(
+    queryRunner: QueryRunner,
+    template: TemplateEntity,
+  ) {
+    return await queryRunner.manager
+      .createQueryBuilder()
+      .update(TemplateEntity)
+      .set({
+        name: template.name,
+        title: template.title,
+        image: template.image,
+      })
+      .where({ id: template.id })
+      .execute();
   }
 
-  async add(body: TemplateCreateDTO) {
-    const template = new TemplateEntity();
-    template.image = body.image;
-    template.is_deleted = false;
-    template.name = body.name;
-    template.title = body.title;
-    return await this.save(template);
+  async addTemplateWithTransaction(
+    queryRunner: QueryRunner,
+    body: TemplateEntity,
+  ) {
+    return await queryRunner.manager.save(TemplateEntity, body);
   }
 
   async findByName(name: string) {
-    return await this.findOne({ where: { name, is_deleted: false } });
+    return await this.findOne({ where: { name, isDeleted: false } });
   }
 
   async deleleById(id: number) {

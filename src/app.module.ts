@@ -16,6 +16,7 @@ import { AuthenMiddleware } from 'common/middleware/authen.middleware';
       database: 'cv-maker-dev',
       entities: [__dirname + '/**/*.entity{.js,.ts}'],
       synchronize: true,
+      logging: true,
     }),
     UserModule,
     TemplateModule,
