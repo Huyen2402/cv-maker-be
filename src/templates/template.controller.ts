@@ -32,7 +32,10 @@ export class TemplateController {
   @Get('/get-all-templates')
   async GetAll(@Res() res) {
     const result = await this.templateService.GetAll();
-    return res.status(result.status).json(result.body);
+    return res
+      .set({ 'content-type': 'image/svg+xml' })
+      .status(result.status)
+      .json(result.body);
   }
 
   @ApiOkResponse({ type: SuccessResRO })
