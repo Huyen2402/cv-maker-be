@@ -18,13 +18,15 @@ export class TemplateService extends BaseService {
   }
 
   async GetAll() {
-    const result = await this.templateRepository.findAll();
-    return {
-      status: 200,
-      body: {
-        result,
-      },
-    };
+    const results = await this.templateRepository.findAll();
+    const response = [];
+    for await (const item of results) {
+      const url = await this.s3Service.GetObjectUrl(item.image);
+      item.image = url;
+      response.push(item);
+    }
+
+    return this.formatData(HttpStatus.OK, response);
   }
 
   async update(id: number, template: TemplateUpdateDTO, file) {
@@ -104,13 +106,13 @@ export class TemplateService extends BaseService {
       async (transactionalEntityManager) => {
         await transactionalEntityManager.queryRunner.startTransaction();
         try {
-          const keyFile = `uploads/${moment(Date()).format(
-            'MM_DD_YYYY_hh_mm_ss',
-          )}_${file.originalname}`;
+          const keyFile = `${moment(Date()).format('MM_DD_YYYY_hh_mm_ss')}_${
+            file.originalname
+          }`;
 
-          const keyImage = `uploads/${moment(Date()).format(
-            'MM_DD_YYYY_hh_mm_ss',
-          )}_${image.originalname}`;
+          const keyImage = `${moment(Date()).format('MM_DD_YYYY_hh_mm_ss')}_${
+            image.originalname
+          }`;
           const template = new TemplateEntity();
           template.isDeleted = false;
           template.name = keyFile;
