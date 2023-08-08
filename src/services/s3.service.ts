@@ -35,4 +35,21 @@ export class S3Service {
       console.log(error);
     }
   }
+  async DeleteObjectUrl(key: string) {
+    try {
+      const s3 = new S3({
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+        region: 'us-east-1',
+        secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY,
+      });
+      const result = await s3.deleteObject({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: 'uploads/' + key,
+      });
+      console.log(result);
+      return result;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
