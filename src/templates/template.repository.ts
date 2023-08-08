@@ -53,11 +53,17 @@ export class TemplateRepository extends Repository<TemplateEntity> {
           .createQueryBuilder()
           .update(TemplateEntity)
           .set({
-            is_deleted: true,
+            isDeleted: true,
           })
           .where({ id })
           .execute();
       },
     );
+  }
+  async deleteTemplateWithTransaction(
+    queryRunner: QueryRunner,
+    body: TemplateEntity,
+  ) {
+    return await queryRunner.manager.save(TemplateEntity, body);
   }
 }
