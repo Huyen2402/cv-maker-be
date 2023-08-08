@@ -37,6 +37,15 @@ export class TemplateController {
       .status(result.status)
       .json(result.body);
   }
+  @ApiOkResponse({ type: TemplateRO })
+  @Get('/get/:id')
+  async GetByID(@Res() res, @Param('id') id: number) {
+    const result = await this.templateService.GetByID(id);
+    return res
+      .set({ 'content-type': 'image/svg+xml' })
+      .status(result.status)
+      .json(result.body);
+  }
 
   @ApiOkResponse({ type: SuccessResRO })
   @ApiConsumes('multipart/form-data')
