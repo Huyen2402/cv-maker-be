@@ -103,7 +103,7 @@ export class TemplateController {
     return res.status(result.status).json(result.body);
   }
 
-  @Delete('/delete:id')
+  @Delete('/delete/:id')
   async delete(@Res() res, @Param('id') id: number) {
     const result = await this.templateService.delete(id);
     return res.status(result.status).json(result.body);
