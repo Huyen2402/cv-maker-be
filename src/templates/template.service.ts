@@ -187,17 +187,24 @@ export class TemplateService extends BaseService {
     await this.templateRepository.manager.transaction(
       async (transactionalEntityManager) => {
         await transactionalEntityManager.queryRunner.startTransaction();
-        result.isDeleted = true;
-        await this.templateRepository.deleteTemplateWithTransaction(
-          transactionalEntityManager.queryRunner,
-          result,
-        );
-        const resultUpload = await this.s3Service.DeleteObjectUrl(result.image); 
-        const resultImage = await this.s3Service.DeleteObjectUrl(result.name);
-        if (!resultUpload || !resultImage) {
+        try {
+          result.isDeleted = true;
+          await this.templateRepository.deleteTemplateWithTransaction(
+            transactionalEntityManager.queryRunner,
+            result,
+          );
+          const resultUpload = await this.s3Service.DeleteObjectUrl(
+            result.image,
+          );
+          const resultImage = await this.s3Service.DeleteObjectUrl(result.name);
+          if (!resultUpload || !resultImage) {
+            await transactionalEntityManager.queryRunner.rollbackTransaction();
+          } else {
+            await transactionalEntityManager.queryRunner.commitTransaction();
+          }
+        } catch (error) {
+          console.log(error);
           await transactionalEntityManager.queryRunner.rollbackTransaction();
-        } else {
-          await transactionalEntityManager.queryRunner.commitTransaction();
         }
       },
     );
