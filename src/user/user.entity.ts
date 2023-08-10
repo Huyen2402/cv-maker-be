@@ -17,7 +17,7 @@ export class UserEntity {
   @Column({ length: 45 })
   phone: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', default: '2023-09-09' })
   dob: Date;
 
   @Column({ name: 'is_deleted' })
