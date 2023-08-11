@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { UserLoginEntity } from '../user_login/user_login.entity';
+import { CvEntity } from '../cv/cv.entity';
 @Entity('user')
 export class UserEntity {
   @PrimaryGeneratedColumn()
@@ -27,4 +28,7 @@ export class UserEntity {
   // user_login: UserLoginEntity[];
   @OneToMany((type) => UserLoginEntity, (user) => user.user)
   user_login: UserLoginEntity[];
+
+  @OneToMany((type) => CvEntity, (cv) => cv.user)
+  cv: CvEntity[];
 }

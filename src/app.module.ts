@@ -4,6 +4,7 @@ import { UserModule } from './user/user.module';
 import { TemplateModule } from './templates/template.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthenMiddleware } from 'common/middleware/authen.middleware';
+import { CvModule } from './cv/cv.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AuthenMiddleware } from 'common/middleware/authen.middleware';
     }),
     UserModule,
     TemplateModule,
+    CvModule,
     ConfigModule.forRoot(),
   ],
 })
