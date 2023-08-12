@@ -1,12 +1,12 @@
 import { _ } from 'lodash';
-import { unlinkSync } from 'fs';
+import { PathLike, unlinkSync } from 'fs';
 import * as moment from 'moment';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { S3Service } from 'src/services/s3.service';
 import { BaseService } from 'src/services/base.service';
 import { CvRepository } from './cv.repository';
-import { CvAddDTO } from './dto/cv.dto';
 import { CvEntity } from './cv.entity';
+import { CvAddDTO } from './dto/cv.dto';
 
 @Injectable()
 export class CvService extends BaseService {
@@ -16,7 +16,7 @@ export class CvService extends BaseService {
   ) {
     super();
   }
-  async create(cv: CvAddDTO, file) {
+  async create(cv: CvAddDTO, file: { originalname: any; path: PathLike }) {
     let result = false;
     const checkCv = await this.cvRepository.findCvByIdTemplate(cv.template_id);
     if (checkCv) {
@@ -28,6 +28,7 @@ export class CvService extends BaseService {
         },
       };
     }
+
     await this.cvRepository.manager.transaction(
       async (transactionalEntityManager) => {
         await transactionalEntityManager.queryRunner.startTransaction();
@@ -35,6 +36,7 @@ export class CvService extends BaseService {
           const keyFile = `${moment(Date()).format('MM_DD_YYYY_hh_mm_ss')}_${
             file.originalname
           }`;
+
           const newCv = new CvEntity();
           newCv.address = cv.address;
           newCv.avatar = keyFile;
@@ -50,19 +52,22 @@ export class CvService extends BaseService {
           newCv.skills = JSON.stringify(cv.skills);
           newCv.template_id = cv.template_id;
           newCv.user = cv.userId;
-          await this.cvRepository.createCv(
+          await this.cvRepository.createCvWithTransaction(
             transactionalEntityManager.queryRunner,
             newCv,
           );
+
           const resultUpload = await this.s3Service.S3UploadV2(file, keyFile);
           if (!resultUpload) {
             await transactionalEntityManager.queryRunner.rollbackTransaction();
           }
           result = true;
+
           await transactionalEntityManager.queryRunner.commitTransaction();
           unlinkSync(file.path);
         } catch (error) {
           console.log(error);
+          unlinkSync(file.path);
           await transactionalEntityManager.queryRunner.rollbackTransaction();
         }
       },
