@@ -54,7 +54,7 @@ export class CvController {
       }),
     }),
   )
-  @Post('/add')
+  @Post('/')
   async create(@Body() cv: CvAddDTO, @Res() res, @UploadedFiles() file) {
     const result = await this.cvService.create(cv, file.avatar[0]);
     return res.status(result.status).json(result.body);
