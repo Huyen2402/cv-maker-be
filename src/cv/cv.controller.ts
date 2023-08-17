@@ -3,7 +3,6 @@ import {
   Post,
   Body,
   Res,
-  Get,
   UseInterceptors,
   UploadedFiles,
 } from '@nestjs/common';
@@ -49,7 +48,7 @@ export class CvController {
     FileFieldsInterceptor([{ name: 'avatar', maxCount: 1 }], {
       storage: diskStorage({
         destination: './offline_file/',
-        filename: function (req, file, cb) {
+        filename: function (_, file, cb) {
           cb(null, file.originalname);
         },
       }),
