@@ -41,7 +41,7 @@ export class CvEntity {
   @Column()
   template_id: number;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, default: '' })
   path: string;
 
   @ManyToOne(() => UserEntity)
