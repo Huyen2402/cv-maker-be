@@ -7,15 +7,32 @@ import { BaseService } from 'src/services/base.service';
 import { CvRepository } from './cv.repository';
 import { CvEntity } from './cv.entity';
 import { CvAddDTO } from './dto/cv.dto';
-
+import { TemplateRepository } from 'src/templates/template.repository';
 @Injectable()
 export class CvService extends BaseService {
   constructor(
     private readonly cvRepository: CvRepository,
+    private readonly tempalteRepository: TemplateRepository,
     private readonly s3Service: S3Service,
   ) {
     super();
   }
+  async GetAll() {
+    const response = [];
+    const results = await this.cvRepository.findAll();
+    console.log(results);
+    for await (const item of results) {
+      const checkItem = await this.tempalteRepository.findTemplate(
+        item.template_id,
+      );
+      const url = await this.s3Service.GetObjectUrl(checkItem.image);
+      item.path = url;
+
+      response.push(item);
+    }
+    return this.formatData(HttpStatus.OK, response);
+  }
+
   async create(cv: CvAddDTO, file: { originalname: any; path: PathLike }) {
     let result = false;
     const checkCv = await this.cvRepository.findCvByIdTemplate(cv.template_id);
