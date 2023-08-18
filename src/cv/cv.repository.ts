@@ -1,4 +1,9 @@
-import { EntityManager, QueryRunner, Repository } from 'typeorm';
+import {
+  EntityManager,
+  QueryRunner,
+  Repository,
+  createQueryBuilder,
+} from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { CvEntity } from './cv.entity';
 
@@ -9,6 +14,11 @@ export class CvRepository extends Repository<CvEntity> {
   }
   async findCvByIdTemplate(id) {
     return await this.findOneBy({ template_id: id });
+  }
+  async findAll() {
+    return await this.find({
+      select: ['id', 'job_title', 'template_id'],
+    });
   }
 
   async createCvWithTransaction(queryRunner: QueryRunner, cv) {
