@@ -5,6 +5,7 @@ import {
   Res,
   UseInterceptors,
   UploadedFiles,
+  Get,
 } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { SuccessResRO } from './ro/cv.ro';
@@ -58,5 +59,15 @@ export class CvController {
   async create(@Body() cv: CvAddDTO, @Res() res, @UploadedFiles() file) {
     const result = await this.cvService.create(cv, file.avatar[0]);
     return res.status(result.status).json(result.body);
+  }
+
+
+  @Get('/get-mycv')
+  async GetAll(@Res() res) {
+    const result = await this.cvService.GetAll();
+    return res
+      .set({ 'content-type': 'image/svg+xml' })
+      .status(result.status)
+      .json(result.body);
   }
 }
