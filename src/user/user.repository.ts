@@ -12,6 +12,10 @@ export class UserRepository extends Repository<UserEntity> {
     return await this.findOne({ where: { email } });
   }
 
+  async findUserByID(id: number) {
+    return await this.findOne({ where: { id } });
+  }
+
   async findOneByEmailAndPassword(email: string, password: string) {
     return await this.findOne({ where: { email, password } });
   }

@@ -7,6 +7,8 @@ import { CvController } from './cv.controller';
 import { S3Service } from 'src/services/s3.service';
 import { TemplateService } from 'src/templates/template.service';
 import { TemplateRepository } from 'src/templates/template.repository';
+import { PDFService } from 'src/services/PDF.service';
+
 
 @Module({
   imports: [TypeOrmModule.forFeature([CvRepository, UserRepository])],
@@ -17,7 +19,9 @@ import { TemplateRepository } from 'src/templates/template.repository';
     CvService,
     S3Service,
     TemplateService,
-    TemplateRepository
+    TemplateRepository,
+    UserRepository,
+    PDFService
   ],
   exports: [CvService],
 })

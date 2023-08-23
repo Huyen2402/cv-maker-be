@@ -17,6 +17,10 @@ export class CvEntity {
   @Column({ length: 255 })
   address: string;
 
+  @Column({ length: 255, default: ''  })
+  email: string;
+
+
   @Column()
   gender: boolean;
 
@@ -43,6 +47,10 @@ export class CvEntity {
 
   @Column({ length: 255, default: '' })
   path: string;
+
+  @Column()
+  userId: number;
+
 
   @ManyToOne(() => UserEntity)
   user: number;

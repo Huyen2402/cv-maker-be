@@ -8,12 +8,16 @@ import { CvRepository } from './cv.repository';
 import { CvEntity } from './cv.entity';
 import { CvAddDTO } from './dto/cv.dto';
 import { TemplateRepository } from 'src/templates/template.repository';
+import { UserRepository } from 'src/user/user.repository';
+import { PDFService } from 'src/services/PDF.service';
 @Injectable()
 export class CvService extends BaseService {
   constructor(
     private readonly cvRepository: CvRepository,
     private readonly tempalteRepository: TemplateRepository,
+    private readonly userRepository: UserRepository,
     private readonly s3Service: S3Service,
+    private readonly pdfService: PDFService,
   ) {
     super();
   }
@@ -33,6 +37,38 @@ export class CvService extends BaseService {
     return this.formatData(HttpStatus.OK, response);
   }
 
+  async generate(id: number) {
+    const results = await this.cvRepository.findCv(id);
+    if (!results) {
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        body: {
+          result: false,
+          message: 'Cv has exist!',
+        },
+      };
+    }
+    const template = await this.tempalteRepository.findTemplate(
+      results.template_id,
+    );
+    const url = await this.s3Service.createDocumentFromTemplate(template.name);
+    const keyResult: any = await this.pdfService.addPDF(results, url);
+    if (!keyResult) {
+      return this.formatData(HttpStatus.INTERNAL_SERVER_ERROR, {
+        message: 'error!',
+      });
+    }
+    const resultUpdate = await this.cvRepository.updatePathById(
+      results.id,
+      keyResult,
+    );
+    if (!resultUpdate) {
+      return this.formatData(HttpStatus.INTERNAL_SERVER_ERROR, {
+        message: 'error!',
+      });
+    }
+    return this.formatData(HttpStatus.OK, results);
+  }
   async create(cv: CvAddDTO, file: { originalname: any; path: PathLike }) {
     let result = false;
     const checkCv = await this.cvRepository.findCvByIdTemplate(cv.template_id);
@@ -59,16 +95,16 @@ export class CvService extends BaseService {
           newCv.avatar = keyFile;
           newCv.gender = cv.gender;
           newCv.job_title = cv.job_title;
-          newCv.experince = JSON.stringify(cv.experince);
+          newCv.experince = cv.experince;
           newCv.name = cv.name;
           newCv.objective = cv.objective;
           newCv.path = cv.path;
-          newCv.certifications = JSON.stringify(cv.certifications);
+          newCv.certifications = cv.certifications;
           newCv.phone = cv.phone;
-          newCv.projects = JSON.stringify(cv.projects);
-          newCv.skills = JSON.stringify(cv.skills);
+          newCv.projects = cv.projects;
+          newCv.skills = cv.skills;
           newCv.template_id = cv.template_id;
-          newCv.user = cv.userId;
+          newCv.userId = cv.userId;
           await this.cvRepository.createCvWithTransaction(
             transactionalEntityManager.queryRunner,
             newCv,
@@ -93,5 +129,11 @@ export class CvService extends BaseService {
       result ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST,
       result,
     );
+  }
+
+  async downloadPDF(body: any) {
+    const path = await this.cvRepository.getPathById(body.cvId);
+    const url = await this.s3Service.GetObjectUrl(`cvs/${path}`);
+    return this.formatData(HttpStatus.OK, { url });
   }
 }
