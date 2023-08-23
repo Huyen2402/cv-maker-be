@@ -31,10 +31,13 @@
     "@types/uuid": "^9.0.2",
     "aws-sdk": "^2.1423.0",
     "bcrypt": "^5.1.0",
+    "docxtemplater": "^3.37.13",
+    "libreoffice-convert": "^1.4.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "mysql2": "^3.4.3",
     "nest-aws-sdk": "^3.0.1",
+    "pizzip": "^3.1.4",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.17"

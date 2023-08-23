@@ -18,6 +18,22 @@ export class S3Service {
     return re;
   }
 
+  async S3UploadV3(blob, key) {
+    const s3 = new S3({
+      region: 'ap-southeast-1',
+      accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY,
+      useDualstackEndpoint: true,
+    });
+    const param = {
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: `uploads/${key}`,
+      Body: blob,
+    };
+    const re = await s3.upload(param).promise();
+    return re;
+  }
+
   async GetObjectUrl(key: string) {
     try {
       const s3 = new S3({
@@ -34,6 +50,23 @@ export class S3Service {
     } catch (error) {
       console.log(error);
     }
+  }
+  async createDocumentFromTemplate(templateKey: string) {
+    const s3 = new S3({
+      region: 'ap-southeast-1',
+      accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY,
+      useDualstackEndpoint: true,
+    });
+    // Download template from S3
+    const templateStream = await s3
+      .getObject({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: 'uploads/' + templateKey,
+      })
+      .promise();
+
+    return templateStream;
   }
   async DeleteObjectUrl(key: string) {
     try {

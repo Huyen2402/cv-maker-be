@@ -61,7 +61,6 @@ export class CvController {
     return res.status(result.status).json(result.body);
   }
 
-
   @Get('/get-mycv')
   async GetAll(@Res() res) {
     const result = await this.cvService.GetAll();
@@ -69,5 +68,17 @@ export class CvController {
       .set({ 'content-type': 'image/svg+xml' })
       .status(result.status)
       .json(result.body);
+  }
+
+  @Post('/generate-pdf')
+  async generatePDF(@Body() cvId: number, @Res() res) {
+    const result = await this.cvService.generate(cvId);
+    return res.status(result.status).json(result.body);
+  }
+
+  @Post('/download-pdf')
+  async downloadPDF(@Body() body: number, @Res() res) {
+    const result = await this.cvService.downloadPDF(body);
+    return res.status(result.status).json(result.body);
   }
 }
