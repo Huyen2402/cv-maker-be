@@ -24,8 +24,6 @@ export class UserEntity {
   @Column({ name: 'is_deleted' })
   isDeleted: boolean;
 
-  // @OneToMany('User_login', (user_login: UserLoginEntity) => user_login.user)
-  // user_login: UserLoginEntity[];
   @OneToMany((type) => UserLoginEntity, (user) => user.user)
   user_login: UserLoginEntity[];
 
