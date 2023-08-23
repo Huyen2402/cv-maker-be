@@ -81,7 +81,7 @@ export class CvService extends BaseService {
         },
       };
     }
-
+    let newCv;
     await this.cvRepository.manager.transaction(
       async (transactionalEntityManager) => {
         await transactionalEntityManager.queryRunner.startTransaction();
@@ -90,7 +90,7 @@ export class CvService extends BaseService {
             file.originalname
           }`;
 
-          const newCv = new CvEntity();
+          newCv = new CvEntity();
           newCv.address = cv.address;
           newCv.avatar = keyFile;
           newCv.gender = cv.gender;
@@ -127,7 +127,7 @@ export class CvService extends BaseService {
     );
     return this.formatData(
       result ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST,
-      result,
+      newCv,
     );
   }
 
