@@ -5,6 +5,8 @@ import { TemplateModule } from './templates/template.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthenMiddleware } from 'common/middleware/authen.middleware';
 import { CvModule } from './cv/cv.module';
+import { JwtModule } from '@nestjs/jwt';
+import { TemplateController } from './templates/template.controller';
 
 @Module({
   imports: [
@@ -16,17 +18,20 @@ import { CvModule } from './cv/cv.module';
       password: 'aA123!@#',
       database: 'cv-maker-dev',
       entities: [__dirname + '/**/*.entity{.js,.ts}'],
-      synchronize: true,
+      // synchronize: true,
       logging: true,
     }),
     UserModule,
     TemplateModule,
     CvModule,
+    JwtModule.register({
+      secret: '12345aA!#',
+    }),
     ConfigModule.forRoot(),
   ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthenMiddleware).forRoutes('user');
+    consumer.apply(AuthenMiddleware).forRoutes(TemplateController);
   }
 }

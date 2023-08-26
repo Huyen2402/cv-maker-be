@@ -47,5 +47,5 @@ export class UserRefreshTokenDTO {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  accessToken: string;
+  refreshToken: string;
 }

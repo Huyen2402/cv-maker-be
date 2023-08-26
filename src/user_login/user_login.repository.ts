@@ -17,8 +17,8 @@ export class UserLoginRepository extends Repository<UserLoginEntity> {
     return await this.save(user);
   }
 
-  async checkAccessToken(access_token: string) {
-    return await this.findOne({ where: { access_token } });
+  async checkRefreshToken(refresh_token: string) {
+    return await this.findOne({ where: { refresh_token } });
   }
 
   async deleteByUser(userId: number) {

@@ -19,7 +19,7 @@ export class UserController {
 
   @Post('/refresh-token')
   async refreshToken(@Body() body: UserRefreshTokenDTO, @Res() res) {
-    const result = await this.userService.refreshToken(body.accessToken);
+    const result = await this.userService.refreshToken(body.refreshToken);
     return res.status(result.status).json(result.body);
   }
 

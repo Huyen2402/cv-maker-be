@@ -80,17 +80,17 @@ export class UserService {
     return token;
   }
 
-  async refreshToken(access_token: string) {
-    const userLoginFound = await this.userLoginRepository.checkAccessToken(
-      access_token,
+  async refreshToken(refreshToken: string) {
+    const userLoginFound = await this.userLoginRepository.checkRefreshToken(
+      refreshToken,
     );
     if (!userLoginFound) {
-      return { status: 403, body: { message: 'Invalid access token.' } };
+      return { status: 403, body: { message: 'Invalid refresh token.' } };
     }
 
     if (userLoginFound.isUsed) {
       await this.userLoginRepository.deleteByUser(userLoginFound.userId);
-      return { status: 403, body: { message: 'Invalid access token.' } };
+      return { status: 403, body: { message: 'Invalid refresh token.' } };
     }
     await this.userLoginRepository.updateIsUsedById(userLoginFound.id);
 
