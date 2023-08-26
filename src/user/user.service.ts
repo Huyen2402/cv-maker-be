@@ -21,7 +21,7 @@ export class UserService {
     }
     const saltOrRounds = 9;
     const hash = await bcrypt.hash(password, saltOrRounds);
-    debug('hash: ', hash) ;
+    debug('hash: ', hash);
     const match = await bcrypt.compare(password, emailFound.password);
     console.log(match);
     if (!match) {
